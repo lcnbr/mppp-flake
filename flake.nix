@@ -6,22 +6,29 @@
   outputs = {
     self,
     nixpkgs,
-  }: {
-    packages.x86_64-linux.mppp = with nixpkgs.legacyPackages.x86_64-linux;
-      stdenv.mkDerivation rec {
+  }: let
+    supportedSystems = ["x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin"];
+    forEachSupportedSystem = f:
+      nixpkgs.lib.genAttrs supportedSystems (system:
+        f {
+          pkgs = import nixpkgs {inherit system;};
+        });
+  in {
+    packages = forEachSupportedSystem ({pkgs}: {
+      default = pkgs.stdenv.mkDerivation rec {
         pname = "mppp";
         version = "0.26"; # Replace with the actual version you intend to package.
 
-        src = fetchFromGitHub {
+        src = pkgs.fetchFromGitHub {
           owner = "bluescarni"; # Replace with the correct owner's name.
           repo = pname;
           rev = "v${version}";
           sha256 = "sha256-GMN19+Qg6d4cYnu6Vj268zHTmK9FV1/D9F+VyIpkm2s="; # Replace with the actual hash.
         };
 
-        nativeBuildInputs = [cmake];
+        nativeBuildInputs = [pkgs.cmake];
 
-        buildInputs = [
+        buildInputs = with pkgs; [
           boost
           gcc
           gnum4
@@ -52,15 +59,7 @@
         installPhase = ''
           make install
         '';
-
-        meta = with lib; {
-          description = "A high-performance arbitrary-precision arithmetic library for C++";
-          license = licenses.mit; # Adjust according to the project's license.
-          maintainers = with maintainers; ["your_name"]; # Add your maintainer name.
-          homepage = "https://github.com/owner_name/mp++";
-        };
       };
-
-    defaultPackage.x86_64-linux = self.packages.x86_64-linux.mppp;
+    });
   };
 }
