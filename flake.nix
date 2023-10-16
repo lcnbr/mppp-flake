@@ -1,23 +1,13 @@
 {
   description = "A flake for mp++";
 
-
-  inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
-  };
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
   outputs = {
     self,
     nixpkgs,
-    flake-utils,
-  }: 
-  
-  flake-utils.lib.eachDefaultSystem (system:  
-  let 
-    pkgs = nixpkgs.legacyPackages.${system};
-    in {
-    packages.${system}.mppp = with nixpkgs.legacyPackages.${system};
+  }: {
+    packages.x86_64-linux.mppp = with nixpkgs.legacyPackages.x86_64-linux;
       stdenv.mkDerivation rec {
         pname = "mppp";
         version = "0.26"; # Replace with the actual version you intend to package.
@@ -71,6 +61,6 @@
         };
       };
 
-    defaultPackage.${system} = self.packages.${system}.mppp;
+    defaultPackage.x86_64-linux = self.packages.x86_64-linux.mppp;
   };
 }
