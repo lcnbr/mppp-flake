@@ -49,7 +49,7 @@
         configurePhase = ''
           mkdir -p build
           cd build
-          cmake ..  -DCMAKE_INSTALL_PREFIX=$out
+          cmake ..  -DCMAKE_INSTALL_PREFIX=$out -DMPPP_WITH_QUADMATH=y -DMPPP_WITH_MPFR=y -DMPPP_WITH_MPC=y
         '';
 
         buildPhase = ''
